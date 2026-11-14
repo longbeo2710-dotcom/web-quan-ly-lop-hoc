@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản lý lớp học thêm</title>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#1b2430;--mut:#667386;--line:#e2e7ee;--pri:#2563eb;--priBg:#e8f0fe;--ok:#15803d;--okBg:#e7f6ec;--warn:#b45309;--warnBg:#fdf1de;--bad:#b91c1c;--badBg:#fde8e8;
+--c0:#2563eb;--c1:#16a34a;--c2:#d97706;--c3:#9333ea;--c4:#0891b2;--c5:#db2777;--c6:#65a30d;--c7:#ea580c}
+@media(prefers-color-scheme:dark){:root{--bg:#0f141b;--card:#171d27;--ink:#e8edf4;--mut:#93a0b3;--line:#2a3342;--pri:#6b9bff;--priBg:#1c2a45;--ok:#4ade80;--okBg:#12301f;--warn:#fbbf24;--warnBg:#3a2c10;--bad:#f87171;--badBg:#3b1a1a}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);padding-bottom:150px}
+button,input,select,textarea{font:inherit;color:inherit}
+header{position:sticky;top:0;z-index:20;background:var(--card);border-bottom:1px solid var(--line)}
+.hwrap{max-width:1100px;margin:0 auto;padding:8px 12px 0}
+.htop{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.htop h1{font-size:17px;margin:0}
+.sync{font-size:12px;color:var(--mut);display:flex;align-items:center;gap:5px}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block}
+.sync.wait i{background:var(--warn)}.sync.local i{background:var(--bad)}
+nav{display:flex;gap:2px;overflow-x:auto;margin-top:6px}
+nav button{border:0;background:none;padding:9px 12px;border-bottom:3px solid transparent;color:var(--mut);white-space:nowrap;cursor:pointer;font-weight:600}
+nav button.on{color:var(--pri);border-color:var(--pri)}
+main{max-width:1100px;margin:0 auto;padding:12px}
+.banner{background:var(--warnBg);color:var(--warn);padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+.card h3{margin:0 0 8px;font-size:16px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between}
+.grow{flex:1;min-width:0}
+.mut{color:var(--mut);font-size:13px}
+.grid2{display:grid;gap:12px;grid-template-columns:1fr}
+@media(min-width:900px){.grid2{grid-template-columns:1fr 1fr}.cal2{grid-template-columns:1.25fr 1fr}}
+.cal2{display:grid;gap:12px;grid-template-columns:1fr;align-items:start}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600}
+.btn:hover{background:var(--priBg)}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.btn.bad{color:var(--bad);border-color:var(--bad)}
+.btn.sm{padding:4px 9px;font-size:13px}
+.ic{border:0;background:none;cursor:pointer;padding:4px 6px;border-radius:6px;color:var(--mut)}
+.ic:hover{background:var(--priBg)}
+input[type=text],input[type=date],input[type=number],input[type=search],select,textarea{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 10px;width:100%}
+select{width:auto}
+label.f{display:block;margin:8px 0 2px;font-size:13px;color:var(--mut)}
+.mnav{display:flex;align-items:center;gap:6px}
+.mnav b{min-width:120px;text-align:center}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal .h{text-align:center;font-size:12px;color:var(--mut);padding:4px 0;font-weight:600}
+.day{min-height:62px;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:3px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.day.off{background:transparent;border-color:transparent;cursor:default}
+.day.tod .dn{background:var(--pri);color:#fff}
+.day.sel{outline:2px solid var(--pri)}
+.dn{font-size:12px;font-weight:700;width:20px;height:20px;border-radius:50%;display:grid;place-items:center}
+.chip{font-style:normal;font-size:10px;line-height:1.3;padding:0 4px;border-radius:4px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:560px){.day{min-height:52px}.chip{font-size:0;height:6px;width:6px;padding:0;border-radius:50%;display:inline-block}.chips{display:flex;gap:2px;flex-wrap:wrap}}
+.c0{background:var(--c0)}.c1{background:var(--c1)}.c2{background:var(--c2)}.c3{background:var(--c3)}.c4{background:var(--c4)}.c5{background:var(--c5)}.c6{background:var(--c6)}.c7{background:var(--c7)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex:none}
+.cls{border:1px solid var(--line);border-radius:10px;margin:8px 0;overflow:hidden}
+.clsh{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg)}
+.clsh label{display:flex;align-items:center;gap:8px;font-weight:700;flex:1;cursor:pointer}
+input[type=checkbox]{width:19px;height:19px;accent-color:var(--pri);flex:none}
+.stu{display:flex;align-items:center;gap:8px;padding:6px 10px;border-top:1px solid var(--line);flex-wrap:wrap}
+.stu.abs{background:var(--badBg)}
+.stu .nm{flex:1;min-width:90px}
+.stu label.v{display:flex;align-items:center;gap:5px;color:var(--bad);font-weight:600;cursor:pointer}
+.tag{font-size:12px;padding:1px 7px;border-radius:10px;background:var(--priBg);color:var(--pri);font-weight:600;white-space:nowrap}
+.tag.ok{background:var(--okBg);color:var(--ok)}.tag.bad{background:var(--badBg);color:var(--bad)}.tag.warn{background:var(--warnBg);color:var(--warn)}
+.item{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line)}
+.item:first-of-type{border-top:0}
+.item .click{cursor:pointer}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th,.tbl td{padding:7px 6px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+.tbl th:first-child,.tbl td:first-child{text-align:left;white-space:normal}
+.tbl th{font-size:12px;color:var(--mut);border-top:0}
+.tbl tfoot td{font-weight:700}
+.scroll{overflow-x:auto}
+.neg{color:var(--bad);font-weight:700}.pos{color:var(--ok);font-weight:700}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:8px 0}
+.tile{background:var(--bg);border-radius:10px;padding:8px 10px}
+.tile b{display:block;font-size:18px}.tile span{font-size:12px;color:var(--mut)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:grid;place-items:center;padding:12px}
+.dlg{background:var(--card);border-radius:14px;width:100%;max-width:480px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.dlg.wide{max-width:640px}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.db{padding:6px 14px 12px;overflow:auto}
+.df{display:flex;gap:8px;justify-content:flex-end;padding:10px 14px;border-top:1px solid var(--line)}
+.prof{position:fixed;inset:0;background:var(--bg);z-index:40;overflow:auto;padding-bottom:150px}
+.prof .in{max-width:900px;margin:0 auto;padding:12px}
+#cmd{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom))}
+#cmd .in{max-width:1100px;margin:0 auto}
+#cmdform{display:flex;gap:6px}
+#reply .msg{border-radius:10px;padding:8px 10px;margin-bottom:8px;font-size:14px;background:var(--priBg)}
+#reply .msg.ok{background:var(--okBg)}#reply .msg.err{background:var(--badBg)}
+.chips2{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:110px;z-index:60;display:flex;flex-direction:column;gap:6px;align-items:center;width:calc(100% - 24px);max-width:520px}
+#toast .t{background:#1f2937;color:#fff;border-radius:10px;padding:9px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 4px 16px rgba(0,0,0,.3);font-size:14px}
+#toast .t button{background:none;border:0;color:#93c5fd;font-weight:700;cursor:pointer}
+.empty{text-align:center;color:var(--mut);padding:18px 8px}
+.logi{border-top:1px solid var(--line);padding:9px 0}
+.logi.undone{opacity:.55}
+.fr{display:flex;gap:6px;align-items:center;margin:4px 0;flex-wrap:wrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+</style>
+</head>
+<body>
+<header><div class="hwrap">
+  <div class="htop"><h1>📚 Quản lý lớp học thêm</h1><div style="display:flex;gap:10px;align-items:center"><button class="ic" id="logout" hidden data-act="logout">Đăng xuất</button><div class="sync wait" id="sync"><i></i><span>Đang kết nối…</span></div></div></div>
+  <nav id="tabs"></nav>
+</div></header>
+<main id="main"></main>
+<div id="prof" class="prof" hidden></div>
+<div id="cmd"><div class="in">
+  <div id="reply"></div>
+  <form id="cmdform" autocomplete="off">
+    <button type="button" class="btn" data-act="helpEx" title="Ví dụ lệnh">?</button>
+    <input id="cmdin" type="text" placeholder="Gõ lệnh, vd: Nam và Lan vắng hôm nay lớp Toán 11" enterkeyhint="send">
+    <button class="btn pri" type="submit">Ghi</button>
+  </form>
+</div></div>
+<div id="modal-root"></div>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+"use strict";
+const APP_CONFIG={url:"https://yxjymegfupmzuyqkssoc.supabase.co",key:"sb_publishable_hm9pfjwzi9GJL8d6tMe-Dg_Fn0ppGjq"};
+/* ============ Tiện ích ============ */
+const $=(s,el=document)=>el.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parseYmd=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=parseYmd(s);d.setDate(d.getDate()+n);return ymd(d)};
+const today=()=>ymd(new Date());
+const WDS=["CN","T2","T3","T4","T5","T6","T7"];
+const WD=["Chủ nhật","Thứ hai","Thứ ba","Thứ tư","Thứ năm","Thứ sáu","Thứ bảy"];
+const fmtDate=s=>{const d=parseYmd(s);return pad(d.getDate())+"/"+pad(d.getMonth()+1)+"/"+d.getFullYear()};
+const fmtShort=s=>{const d=parseYmd(s);return pad(d.getDate())+"/"+pad(d.getMonth()+1)};
+const money=n=>{n=Math.round(n||0);return (n<0?"-":"")+Math.abs(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g,".")+"đ"};
+const monthLabel=m=>"Tháng "+(+m.slice(5))+"/"+m.slice(0,4);
+const addMonth=(m,n)=>{let y=+m.slice(0,4),mo=+m.slice(5)-1+n;y+=Math.floor(mo/12);mo=((mo%12)+12)%12;return y+"-"+pad(mo+1)};
+const uid=()=>Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4);
+const clone=o=>o==null?o:JSON.parse(JSON.stringify(o));
+const norm=s=>s.normalize("NFC").toLowerCase().replace(/đ/g,"d").normalize("NFD").replace(/\p{M}/gu,"");
+const TYPES={"":"Chưa ghi rõ","P":"Có phép","K":"Không phép"};
+
+/* ============ Dữ liệu & DB ============ */
+const D={classes:new Map(),students:new Map(),sessions:new Map(),payments:new Map(),logs:[]};
+let db=null;
+const ST={tab:"cal",month:today().slice(0,7),date:today(),moneyMonth:today().slice(0,7),hist:{cid:"",month:"",sid:""},profile:null,pending:null,sync:"wait",q:"",local:false};
+let IDX=null;const CM=new Map();
+const invalidate=()=>{IDX=null;CM.clear()};
+
+function localDB(){
+  const KEY="qlhs-local-v1";let store={};
+  try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+  const subs=new Set();
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
+  const fire=()=>subs.forEach(f=>f());
+  const docsOf=c=>Object.keys(store).filter(k=>k.startsWith(c+"/")&&!k.slice(c.length+1).includes("/")).map(k=>({id:k.slice(c.length+1),data:store[k]}));
+  const snap=d=>({docs:d.map(x=>({id:x.id,exists:true,data:()=>x.data,metadata:{fromCache:false}})),size:d.length,empty:!d.length,metadata:{fromCache:false,hasPendingWrites:false}});
+  function query(c,ord,lim){
+    const run=()=>{let d=docsOf(c);if(ord)d.sort((a,b)=>{const x=a.data[ord.f],y=b.data[ord.f];return (x>y?1:x<y?-1:0)*(ord.dir==="desc"?-1:1)});if(lim)d=d.slice(0,lim);return d};
+    return{orderBy:(f,dir)=>query(c,{f,dir:dir||"asc"},lim),limit:n=>query(c,ord,n),get:async()=>snap(run()),
+      onSnapshot:next=>{const f=()=>next(snap(run()));subs.add(f);setTimeout(f,0);return()=>subs.delete(f)}};
+  }
+  const doc=p=>({id:p.split("/").pop(),path:p,
+    get:async()=>({id:p.split("/").pop(),exists:p in store,data:()=>store[p]}),
+    set:async d=>{store[p]=clone(d);save();fire()},
+    update:async d=>{store[p]=Object.assign({},store[p],clone(d));save();fire()},
+    delete:async()=>{delete store[p];save();fire()}});
+  return{doc,collection:c=>Object.assign(query(c),{doc:id=>doc(c+"/"+id)})};
+}
+
+
+/* ---- Supabase adapter: cùng giao diện db.doc / db.collection ---- */
+function supabaseDB(sb,userId){
+  const subs=new Map();let timer={};
+  async function fetchAll(c){const out=[];for(let from=0;;from+=1000){
+    const {data,error}=await sb.from("docs").select("id,data").eq("coll",c).order("id").range(from,from+999);
+    if(error)throw error;out.push(...data);if(data.length<1000)break}return out}
+  const snap=d=>({docs:d.map(x=>({id:x.id,exists:true,data:()=>x.data,metadata:{fromCache:false}})),size:d.length,empty:!d.length,metadata:{fromCache:false,hasPendingWrites:false}});
+  const kick=c=>{(subs.get(c)||[]).forEach(f=>f())};
+  function query(c,ord,lim){
+    const get=async()=>{let rows=await fetchAll(c);
+      if(ord)rows.sort((a,b)=>{const x=a.data[ord.f],y=b.data[ord.f];return(x>y?1:x<y?-1:0)*(ord.dir==="desc"?-1:1)});
+      if(lim)rows=rows.slice(0,lim);return snap(rows)};
+    return{orderBy:(f,dir)=>query(c,{f,dir:dir||"asc"},lim),limit:n=>query(c,ord,n),get,
+      onSnapshot:(next,err)=>{let dead=false,pend=null;
+        const run=()=>{if(pend)return;pend=setTimeout(async()=>{pend=null;if(dead)return;try{next(await get())}catch(e){err&&err(e)}},120)};
+        if(!subs.has(c))subs.set(c,new Set());subs.get(c).add(run);run();
+        const ch=sb.channel("rt-"+c+"-"+uid()).on("postgres_changes",{event:"*",schema:"public",table:"docs",filter:"coll=eq."+c},run).subscribe();
+        const poll=setInterval(run,30000);
+        return()=>{dead=true;subs.get(c).delete(run);clearInterval(poll);sb.removeChannel(ch)}}};
+  }
+  const doc=p=>{const [c,id]=p.split("/");
+    const up=async data=>{const {error}=await sb.from("docs").upsert({owner:userId,coll:c,id,data,updated_at:new Date().toISOString()},{onConflict:"owner,coll,id"});if(error)throw error;kick(c)};
+    return{id,path:p,
+      get:async()=>{const {data,error}=await sb.from("docs").select("data").eq("coll",c).eq("id",id).maybeSingle();if(error)throw error;return{id,exists:!!data,data:()=>data&&data.data}},
+      set:data=>up(clone(data)),
+      update:async patch=>{const {data,error}=await sb.from("docs").select("data").eq("coll",c).eq("id",id).maybeSingle();if(error)throw error;await up(Object.assign({},data&&data.data,clone(patch)))},
+      delete:async()=>{const {error}=await sb.from("docs").delete().eq("coll",c).eq("id",id);if(error)throw error;kick(c)}}};
+  return{doc,collection:c=>Object.assign(query(c),{doc:id=>doc(c+"/"+id)})};
+}
+async function ensureLogin(sb){
+  const {data}=await sb.auth.getSession();if(data&&data.session)return data.session;
+  return new Promise(resolve=>{
+    const el=document.createElement("div");el.className="overlay";
+    el.innerHTML=`<form class="dlg"><div class="dh"><b>Đăng nhập</b></div><div class="db"><p class="mut">Dữ liệu học sinh được bảo vệ. Đăng nhập để tiếp tục.</p>
+    <label class="f">Email</label><input type="text" name="e" autocomplete="username"><label class="f">Mật khẩu (tối thiểu 6 ký tự)</label><input type="password" name="p" autocomplete="current-password" style="width:100%;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 10px">
+    <div id="lerr" class="mut" style="color:var(--bad);margin-top:6px"></div></div><div class="df"><button type="button" class="btn" data-su>Tạo tài khoản</button><button class="btn pri">Đăng nhập</button></div></form>`;
+    document.body.append(el);const f=el.querySelector("form"),er=el.querySelector("#lerr");
+    const go=async mode=>{er.textContent="";const email=f.e.value.trim(),password=f.p.value;
+      const r=mode==="up"?await sb.auth.signUp({email,password}):await sb.auth.signInWithPassword({email,password});
+      if(r.error){er.textContent=r.error.message;return}
+      if(!r.data.session){er.textContent="Tài khoản đã tạo. Hãy xác nhận email (nếu được yêu cầu) rồi đăng nhập.";return}
+      el.remove();resolve(r.data.session)};
+    f.addEventListener("submit",e=>{e.preventDefault();go("in")});el.querySelector("[data-su]").onclick=()=>go("up");
+  });
+}
+
+function subscribe(){
+  const fc={};let timer=setTimeout(()=>{if(ST.sync==="wait"){ST.sync="slow";render()}},10000);
+  const upd=(name,snap)=>{fc[name]=snap.metadata&&snap.metadata.fromCache;
+    const any=Object.values(fc).some(Boolean)||Object.keys(fc).length<5;
+    ST.sync=ST.local?"local":(any?"wait":"ok");if(!any)clearTimeout(timer)};
+  const bind=(name,map)=>db.collection(name).onSnapshot(snap=>{
+    const m=new Map();snap.docs.forEach(d=>m.set(d.id,d.data()));D[name]=m;invalidate();upd(name,snap);render()},
+    e=>{console.error(name,e);ST.sync="err";render()});
+  bind("classes");bind("students");bind("sessions");bind("payments");
+  db.collection("logs").orderBy("ts","desc").limit(150).onSnapshot(snap=>{
+    D.logs=snap.docs.map(d=>Object.assign({id:d.id},d.data()));upd("logs",snap);render()},e=>console.error(e));
+}
+
+/* ============ Giao dịch (ghi + nhật ký + hoàn tác) ============ */
+class Tx{
+  constructor(){this.w=new Map()}
+  _e(coll,id){const k=coll+"/"+id;let e=this.w.get(k);if(!e){const b=D[coll].get(id)||null;e={coll,id,before:b,after:clone(b)};this.w.set(k,e)}return e}
+  get(coll,id){return this._e(coll,id).after}
+  mut(coll,id,init){const e=this._e(coll,id);if(e.after===null)e.after=clone(init);return e.after}
+  del(coll,id){this._e(coll,id).after=null}
+  ops(){return[...this.w.values()].filter(o=>JSON.stringify(o.before)!==JSON.stringify(o.after))}
+}
+async function commit(tx,meta){
+  const ops=tx.ops();if(!ops.length)return null;
+  for(const o of ops){const ref=db.doc(o.coll+"/"+o.id);if(o.after===null)await ref.delete();else await ref.set(o.after)}
+  let lops=ops.map(o=>({c:o.coll,i:o.id,b:o.before,a:o.after}));let noUndo=false;
+  if(JSON.stringify(lops).length>200000){lops=lops.map(o=>({c:o.c,i:o.i}));noUndo=true}
+  const id=uid();
+  await db.doc("logs/"+id).set({ts:Date.now(),text:meta.text||"",summary:meta.summary||"",src:meta.src||"Thủ công",ops:lops,undone:false,noUndo,n:ops.length});
+  return id;
+}
+async function act(summary,fn){
+  try{const tx=new Tx();const r=fn(tx);if(r===false)return;const id=await commit(tx,{text:summary,summary,src:"Thủ công"});if(id)toast(summary,id)}
+  catch(e){console.error(e);toast("Lỗi ghi dữ liệu: "+(e.message||e.code||e))}
+}
+async function undo(id){
+  const lg=D.logs.find(x=>x.id===id);if(!lg||lg.undone||lg.noUndo)return;
+  try{
+    for(const o of [...lg.ops].reverse()){const ref=db.doc(o.c+"/"+o.i);if(o.b===null||o.b===undefined)await ref.delete();else await ref.set(o.b)}
+    await db.doc("logs/"+id).update({undone:true});toast("Đã hoàn tác: "+(lg.summary||lg.text));
+  }catch(e){console.error(e);toast("Không hoàn tác được: "+(e.message||e.code))}
+}
+
+/* ============ Tính toán ============ */
+const classList=()=>[...D.classes].map(([id,c])=>Object.assign({id},c)).sort((a,b)=>a.name.localeCompare(b.name,"vi"));
+const givenName=n=>{const t=n.trim().split(/\s+/);return t[t.length-1]+" "+n};
+const studentList=()=>[...D.students].map(([id,s])=>Object.assign({id},s)).sort((a,b)=>givenName(a.name).localeCompare(givenName(b.name),"vi"));
+const classFee=(c,m)=>{const l=[...(c.fees||[])].sort((a,b)=>a.from<b.from?-1:1);let f=l.length?l[0].fee:0;for(const x of l)if(x.from<=m)f=x.fee;return f};
+function feeFor(s,cid,date){
+  const c=D.classes.get(cid);const m=date.slice(0,7);const base=c?classFee(c,m):0;let best=null;
+  for(const o of s.fees||[]){if((o.classId===cid||o.classId==="")&&o.from<=m){if(!best||o.from>best.from||(o.from===best.from&&o.classId===cid&&best.classId===""))best=o}}
+  return best?best.fee:base;
+}
+function inEnroll(s,cid,date){const e=s.enroll&&s.enroll[cid];return !!e&&date>=e.from&&(!e.to||date<=e.to)}
+function idx(){
+  if(IDX)return IDX;const byDate=new Map(),byMonth=new Map();
+  for(const [id,s] of D.sessions){if(!D.classes.has(s.classId))continue;const o=Object.assign({id},s);
+    (byDate.get(s.date)||byDate.set(s.date,[]).get(s.date)).push(o);
+    const m=s.date.slice(0,7);(byMonth.get(m)||byMonth.set(m,[]).get(m)).push(o)}
+  for(const a of byMonth.values())a.sort((x,y)=>x.date<y.date?-1:x.date>y.date?1:0);
+  return IDX={byDate,byMonth};
+}
+const sesId=(cid,date)=>cid+"_"+date;
+function roster(cid,date){return studentList().filter(s=>inEnroll(s,cid,date))}
+const payId=(sid,cid,m)=>sid+"_"+cid+"_"+m;
+const sumPaid=p=>(p&&p.entries||[]).reduce((a,e)=>a+(+e.amount||0),0);
+function calc(month){
+  if(CM.has(month))return CM.get(month);
+  const R=new Map();const get=(sid,cid)=>{const k=sid+"|"+cid;let r=R.get(k);if(!r){r={sid,cid,att:0,abs:0,absP:0,absK:0,due:0,paid:0,items:[]};R.set(k,r)}return r};
+  const studs=studentList();
+  for(const se of idx().byMonth.get(month)||[]){
+    for(const s of studs){if(!inEnroll(s,se.classId,se.date))continue;
+      const a=se.absent&&se.absent[s.id];const fee=feeFor(s,se.classId,se.date);const r=get(s.id,se.classId);
+      if(a){r.abs++;if(a.type==="P")r.absP++;else if(a.type==="K")r.absK++;r.items.push({date:se.date,absent:true,type:a.type||"",note:a.note||"",fee,charged:0})}
+      else{r.att++;r.due+=fee;r.items.push({date:se.date,absent:false,fee,charged:fee})}}
+  }
+  for(const [id,p] of D.payments){if(p.month!==month||!D.students.has(p.studentId)||!D.classes.has(p.classId))continue;get(p.studentId,p.classId).paid+=sumPaid(p)}
+  CM.set(month,R);return R;
+}
+function allMonths(){const s=new Set([...idx().byMonth.keys()]);for(const p of D.payments.values())s.add(p.month);return [...s].sort()}
+
+/* ============ Hiển thị ============ */
+let rq=0;function render(){if(rq)return;rq=setTimeout(()=>{rq=0;doRender()},10)}
+const TABS=[["cal","📅 Lịch"],["manage","👥 Lớp & học sinh"],["money","💰 Học phí"],["hist","🕘 Lịch sử buổi học"],["log","📝 Nhật ký"]];
+function doRender(){
+  const sy=$("#sync");const L={ok:["","Đã đồng bộ"],wait:["wait","Đang đồng bộ…"],slow:["wait","Chưa kết nối được, dữ liệu có thể cũ"],local:["local","Chế độ cục bộ (không đồng bộ)"],err:["local","Lỗi kết nối"]}[ST.sync]||["",""];
+  $("#logout").hidden=!ST.sb;sy.className="sync "+L[0];sy.querySelector("span").textContent=L[1];
+  $("#tabs").innerHTML=TABS.map(([k,l])=>`<button class="${ST.tab===k?"on":""}" data-act="tab" data-tab="${k}">${l}</button>`).join("");
+  const V={cal:viewCal,manage:viewManage,money:viewMoney,hist:viewHist,log:viewLog}[ST.tab];
+  $("#main").innerHTML=(ST.local?`<div class="banner">Chưa kết nối được kho dữ liệu đám mây nên dữ liệu chỉ lưu trên thiết bị này. Mở lại trang khi đã đăng nhập Claude để đồng bộ giữa các thiết bị.</div>`:"")+V();
+  renderProfile();
+}
+
+/* ---- Lịch ---- */
+function viewCal(){
+  const [y,mo]=ST.month.split("-").map(Number);const first=new Date(y,mo-1,1);const off=(first.getDay()+6)%7;const n=new Date(y,mo,0).getDate();
+  const cells=[];for(let i=0;i<off;i++)cells.push(null);for(let d=1;d<=n;d++)cells.push(ST.month+"-"+pad(d));while(cells.length%7)cells.push(null);
+  const T=today();const I=idx();
+  let g=["T2","T3","T4","T5","T6","T7","CN"].map(x=>`<div class="h">${x}</div>`).join("");
+  for(const c of cells){
+    if(!c){g+=`<div class="day off"></div>`;continue}
+    const ss=(I.byDate.get(c)||[]).slice().sort((a,b)=>a.classId<b.classId?-1:1);
+    g+=`<button class="day ${c===T?"tod":""} ${c===ST.date?"sel":""}" data-act="pick" data-date="${c}"><span class="dn">${+c.slice(8)}</span><span class="chips">${ss.map(s=>{const k=D.classes.get(s.classId);return `<i class="chip c${k.color||0}" title="${esc(k.name)}">${esc(k.name)}</i>`}).join("")}</span></button>`;
+  }
+  const mc=calc(ST.month);const cnt=(I.byMonth.get(ST.month)||[]).length;
+  return `<div class="cal2"><section class="card">
+    <div class="row"><div class="mnav"><button class="btn" data-act="mshift" data-d="-1">‹</button><b>${monthLabel(ST.month)}</b><button class="btn" data-act="mshift" data-d="1">›</button></div>
+    <button class="btn sm" data-act="goToday">Hôm nay</button></div>
+    <p class="mut" style="margin:6px 0">${cnt} buổi dạy trong tháng. Chạm vào một ngày để chọn lớp có học và điểm danh.</p>
+    <div class="cal">${g}</div></section>
+    <section>${dayPanel(ST.date)}</section></div>`;
+}
+function dayPanel(date){
+  const d=parseYmd(date);const cs=classList();
+  let h=`<div class="card"><h3>${WD[d.getDay()]}, ${fmtDate(date)}</h3>`;
+  if(!cs.length)return h+`<div class="empty">Chưa có lớp nào. Vào tab “Lớp & học sinh” để tạo lớp.</div></div>`;
+  h+=`<p class="mut" style="margin:0 0 4px">Tick lớp có học. Cả lớp mặc định có mặt — chỉ tick “Vắng” cho học sinh nghỉ.</p>`;
+  for(const c of cs){
+    const id=sesId(c.id,date);const se=D.sessions.get(id);
+    h+=`<div class="cls"><div class="clsh"><label><input type="checkbox" data-chg="tick" data-cid="${c.id}" data-date="${date}" ${se?"checked":""}><span class="dot c${c.color||0}"></span>${esc(c.name)}</label>${se?`<button class="ic" data-act="sesnote" data-id="${id}" title="Ghi chú buổi học">✎ ghi chú</button>`:""}</div>`;
+    if(se){
+      const r=roster(c.id,date);const ab=r.filter(s=>se.absent&&se.absent[s.id]).length;
+      if(se.note)h+=`<div class="mut" style="padding:4px 10px">📝 ${esc(se.note)}</div>`;
+      if(!r.length)h+=`<div class="mut" style="padding:8px 10px">Lớp chưa có học sinh (tính từ ngày này).</div>`;
+      else h+=`<div class="mut" style="padding:4px 10px">Có mặt ${r.length-ab}/${r.length} · học phí ${money(classFee(c,date.slice(0,7)))}/buổi</div>`;
+      for(const s of r){
+        const a=se.absent&&se.absent[s.id];
+        h+=`<div class="stu ${a?"abs":""}"><span class="nm">${esc(s.name)}</span>
+        ${a?`<select data-chg="abstype" data-id="${id}" data-sid="${s.id}">${Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${a.type===k?"selected":""}>${v}</option>`).join("")}</select><button class="ic" data-act="absnote" data-id="${id}" data-sid="${s.id}" title="Ghi chú">✎</button>${a.note?`<span class="mut">${esc(a.note)}</span>`:""}`:""}
+        <label class="v"><input type="checkbox" data-chg="abs" data-id="${id}" data-sid="${s.id}" ${a?"checked":""}>Vắng</label></div>`;
+      }
+    }
+    h+=`</div>`;
+  }
+  return h+`</div>`;
+}
+
+/* ---- Lớp & học sinh ---- */
+function viewManage(){
+  const cs=classList();const cm=today().slice(0,7);
+  let h=`<div class="grid2"><section class="card"><div class="row"><h3>Lớp học</h3><button class="btn pri sm" data-act="newClass">+ Tạo lớp</button></div>`;
+  if(!cs.length)h+=`<div class="empty">Chưa có lớp. Bấm “Tạo lớp” để bắt đầu.</div>`;
+  for(const c of cs){const n=studentList().filter(s=>s.enroll&&s.enroll[c.id]).length;
+    h+=`<div class="item"><span class="dot c${c.color||0}"></span><div class="grow"><b>${esc(c.name)}</b><div class="mut">${money(classFee(c,cm))}/buổi · ${n} học sinh</div></div><button class="btn sm" data-act="histGo" data-cid="${c.id}">Lịch sử</button><button class="btn sm" data-act="editClass" data-id="${c.id}">Sửa</button></div>`}
+  h+=`</section><section class="card"><div class="row"><h3>Học sinh</h3><button class="btn pri sm" data-act="newStudent">+ Thêm học sinh</button></div>
+  <input id="sq" type="search" placeholder="Tìm học sinh…" value="${esc(ST.q)}" style="margin:6px 0"><div id="slist">${studentListHtml()}</div></section></div>`;
+  return h;
+}
+function studentListHtml(){
+  const q=norm(ST.q||"").trim();const ss=studentList().filter(s=>!q||norm(s.name).includes(q));
+  if(!ss.length)return `<div class="empty">${D.students.size?"Không tìm thấy.":"Chưa có học sinh."}</div>`;
+  return ss.map(s=>{const cl=Object.keys(s.enroll||{}).filter(k=>D.classes.has(k)).map(k=>D.classes.get(k));
+    return `<div class="item"><div class="grow click" data-act="openStudent" data-id="${s.id}"><b>${esc(s.name)}</b><div>${cl.map(c=>`<span class="tag" style="background:var(--c${c.color||0});color:#fff">${esc(c.name)}</span>`).join(" ")||'<span class="mut">chưa vào lớp</span>'}</div></div><button class="btn sm" data-act="editStudent" data-id="${s.id}">Sửa</button></div>`}).join("");
+}
+
+/* ---- Học phí ---- */
+function viewMoney(){
+  const m=ST.moneyMonth;const R=calc(m);const cs=classList();
+  let tDue=0,tPaid=0;for(const r of R.values()){tDue+=r.due;tPaid+=r.paid}
+  let h=`<div class="card"><div class="row"><div class="mnav"><button class="btn" data-act="mmshift" data-d="-1">‹</button><b>${monthLabel(m)}</b><button class="btn" data-act="mmshift" data-d="1">›</button></div></div>
+  <div class="tiles"><div class="tile"><span>Phải thu</span><b>${money(tDue)}</b></div><div class="tile"><span>Đã thu</span><b class="pos">${money(tPaid)}</b></div><div class="tile"><span>Còn thiếu</span><b class="${tDue-tPaid>0?"neg":""}">${money(tDue-tPaid)}</b></div></div></div>`;
+  let any=false;
+  for(const c of cs){
+    const rows=[...R.values()].filter(r=>r.cid===c.id&&D.students.has(r.sid)).map(r=>Object.assign({name:D.students.get(r.sid).name},r)).sort((a,b)=>givenName(a.name).localeCompare(givenName(b.name),"vi"));
+    if(!rows.length)continue;any=true;
+    const d=rows.reduce((a,r)=>a+r.due,0),p=rows.reduce((a,r)=>a+r.paid,0);
+    h+=`<div class="card"><div class="row"><h3><span class="dot c${c.color||0}"></span> ${esc(c.name)}</h3><span class="tag ${d-p>0?"bad":"ok"}">Cả lớp còn thiếu: ${money(d-p)}</span></div>
+    <div class="scroll"><table class="tbl"><thead><tr><th>Học sinh</th><th>Học</th><th>Vắng</th><th>Phải đóng</th><th>Đã đóng</th><th>Còn thiếu</th><th></th></tr></thead><tbody>
+    ${rows.map(r=>{const o=r.due-r.paid;return `<tr><td><a href="javascript:void 0" data-act="openStudent" data-id="${r.sid}" style="color:var(--pri);text-decoration:none;font-weight:600">${esc(r.name)}</a></td><td>${r.att}</td><td>${r.abs}</td><td>${money(r.due)}</td><td><a href="javascript:void 0" data-act="editPays" data-sid="${r.sid}" data-cid="${c.id}" data-m="${m}" style="color:inherit" title="Sửa số tiền đã thu">${money(r.paid)} ✎</a></td><td class="${o>0?"neg":o<0?"pos":""}">${o<0?"dư "+money(-o):money(o)}</td><td><button class="btn sm" data-act="addPay" data-sid="${r.sid}" data-cid="${c.id}" data-m="${m}">+ Thu</button></td></tr>`}).join("")}
+    </tbody><tfoot><tr><td>Tổng</td><td>${rows.reduce((a,r)=>a+r.att,0)}</td><td>${rows.reduce((a,r)=>a+r.abs,0)}</td><td>${money(d)}</td><td>${money(p)}</td><td class="${d-p>0?"neg":""}">${money(d-p)}</td><td></td></tr></tfoot></table></div></div>`;
+  }
+  if(!any)h+=`<div class="card empty">Tháng này chưa có buổi học nào.</div>`;
+  return h;
+}
+
+/* ---- Lịch sử buổi học ---- */
+function viewHist(){
+  const cs=classList();const H=ST.hist;
+  if(!cs.length)return `<div class="card empty">Chưa có lớp nào.</div>`;
+  if(!H.cid||!D.classes.has(H.cid))H.cid=cs[0].id;
+  const c=D.classes.get(H.cid);
+  let all=[...D.sessions].filter(([,s])=>s.classId===H.cid).map(([id,s])=>Object.assign({id},s)).sort((a,b)=>a.date<b.date?1:-1);
+  const months=[...new Set(all.map(s=>s.date.slice(0,7)))];
+  const studs=studentList().filter(s=>s.enroll&&s.enroll[H.cid]);
+  if(H.sid&&!studs.find(s=>s.id===H.sid))H.sid="";
+  let list=all.filter(s=>!H.month||s.date.slice(0,7)===H.month);
+  const st=H.sid?D.students.get(H.sid):null;
+  if(st)list=list.filter(s=>inEnroll(st,H.cid,s.date));
+  let tot=0,att=0,ab=0;
+  const rowsHtml=list.map(s=>{const d=parseYmd(s.date);const r=roster(H.cid,s.date);const abn=r.filter(x=>s.absent&&s.absent[x.id]);
+    let mid;
+    if(st){const a=s.absent&&s.absent[st.id];const fee=feeFor(st,H.cid,s.date);if(a){ab++;mid=`<span class="tag bad">Vắng ${TYPES[a.type||""].toLowerCase()}</span> ${esc(a.note||"")}`}else{att++;tot+=fee;mid=`<span class="tag ok">Có mặt</span>`}
+      return `<tr><td>${WDS[d.getDay()]} ${fmtDate(s.date)}</td><td style="text-align:left">${mid}</td><td>${a?"0đ":money(fee)}</td><td><button class="btn sm" data-act="goDay" data-date="${s.date}">Mở</button></td></tr>`}
+    return `<tr><td>${WDS[d.getDay()]} ${fmtDate(s.date)}</td><td style="text-align:left">${r.length-abn.length}/${r.length} có mặt${abn.length?` · vắng: ${abn.map(x=>`${esc(x.name)} <span class="tag ${s.absent[x.id].type==="P"?"warn":"bad"}">${TYPES[s.absent[x.id].type||""]}</span>`).join(", ")}`:""}${s.note?`<div class="mut">📝 ${esc(s.note)}</div>`:""}</td><td></td><td><button class="btn sm" data-act="goDay" data-date="${s.date}">Mở</button></td></tr>`}).join("");
+  return `<div class="card"><h3>Lịch sử buổi học</h3><div class="filters">
+   <select data-chg="hist" data-k="cid">${cs.map(x=>`<option value="${x.id}" ${x.id===H.cid?"selected":""}>${esc(x.name)}</option>`).join("")}</select>
+   <select data-chg="hist" data-k="month"><option value="">Tất cả tháng</option>${months.map(m=>`<option value="${m}" ${m===H.month?"selected":""}>${monthLabel(m)}</option>`).join("")}</select>
+   <select data-chg="hist" data-k="sid"><option value="">Tất cả học sinh</option>${studs.map(s=>`<option value="${s.id}" ${s.id===H.sid?"selected":""}>${esc(s.name)}</option>`).join("")}</select></div>
+   ${list.length?`<div class="scroll"><table class="tbl"><thead><tr><th>Ngày</th><th style="text-align:left">${st?"Trạng thái":"Điểm danh"}</th><th>${st?"Tiền":""}</th><th></th></tr></thead><tbody>${rowsHtml}</tbody>${st?`<tfoot><tr><td>Tổng</td><td style="text-align:left">${att} buổi học · ${ab} buổi vắng</td><td>${money(tot)}</td><td></td></tr></tfoot>`:""}</table></div>`:`<div class="empty">Chưa có buổi học nào${H.month||H.sid?" theo bộ lọc":""}.</div>`}
+   <p class="mut">Tổng ${list.length} buổi của lớp ${esc(c.name)}.</p></div>`;
+}
+
+/* ---- Nhật ký ---- */
+function viewLog(){
+  if(!D.logs.length)return `<div class="card empty">Chưa có thay đổi nào được ghi lại.</div>`;
+  return `<div class="card"><h3>Nhật ký thay đổi</h3><p class="mut">Mọi lệnh và chỉnh sửa đều được ghi lại và có thể hoàn tác.</p>`+D.logs.map(l=>{const d=new Date(l.ts);
+    return `<div class="logi ${l.undone?"undone":""}"><div class="row"><span class="mut">${pad(d.getHours())}:${pad(d.getMinutes())} ${fmtDate(ymd(d))} · <span class="tag">${esc(l.src)}</span></span>${l.undone?`<span class="tag warn">Đã hoàn tác</span>`:l.noUndo?`<span class="mut">không hoàn tác được</span>`:`<button class="btn sm" data-act="undo" data-id="${l.id}">↩ Hoàn tác</button>`}</div>
+    ${l.src==="Lệnh"?`<div>“${esc(l.text)}”</div>`:""}<div class="mut">${esc(l.summary)}</div></div>`}).join("")+`</div>`;
+}
+
+/* ---- Hồ sơ học sinh ---- */
+function renderProfile(){
+  const el=$("#prof");const P=ST.profile;
+  if(!P||!D.students.has(P.sid)){el.hidden=true;el.innerHTML="";if(P&&!D.students.has(P.sid))ST.profile=null;return}
+  const s=Object.assign({id:P.sid},D.students.get(P.sid));const m=P.month;const R=calc(m);
+  const mine=[...R.values()].filter(r=>r.sid===s.id);
+  const items=[];mine.forEach(r=>r.items.forEach(i=>items.push(Object.assign({cid:r.cid},i))));
+  items.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+  const att=mine.reduce((a,r)=>a+r.att,0),abs=mine.reduce((a,r)=>a+r.abs,0),due=mine.reduce((a,r)=>a+r.due,0),paid=mine.reduce((a,r)=>a+r.paid,0);
+  const absP=mine.reduce((a,r)=>a+r.absP,0),absK=mine.reduce((a,r)=>a+r.absK,0);
+  const cl=Object.entries(s.enroll||{}).filter(([k])=>D.classes.has(k));
+  const months=allMonths().filter(mm=>[...calc(mm).values()].some(r=>r.sid===s.id&&(r.items.length||r.paid)));
+  const pays=[];for(const [id,p] of D.payments)if(p.studentId===s.id&&p.month===m&&D.classes.has(p.classId))(p.entries||[]).forEach(e=>pays.push({cid:p.classId,e}));
+  el.hidden=false;
+  el.innerHTML=`<div class="in"><div class="row" style="margin-bottom:8px"><button class="btn" data-act="closeProfile">← Quay lại</button><button class="btn" data-act="editStudent" data-id="${s.id}">Sửa hồ sơ</button></div>
+  <div class="card"><h2 style="margin:0">${esc(s.name)}</h2><div class="mut">${esc(s.phone||"")}${s.phone&&s.note?" · ":""}${esc(s.note||"")}</div>
+  <div style="margin-top:8px">${cl.map(([k,e])=>{const c=D.classes.get(k);return `<div class="mut"><span class="dot c${c.color||0}"></span> <b>${esc(c.name)}</b> · vào học từ ${fmtDate(e.from)}${e.to?" đến "+fmtDate(e.to):""} · ${money(feeFor(s,k,today()))}/buổi</div>`}).join("")||'<span class="mut">Chưa vào lớp nào</span>'}</div></div>
+  <div class="card"><div class="row"><div class="mnav"><button class="btn" data-act="pmshift" data-d="-1">‹</button><b>${monthLabel(m)}</b><button class="btn" data-act="pmshift" data-d="1">›</button></div></div>
+  <div class="tiles"><div class="tile"><span>Số buổi đi học</span><b>${att}</b></div><div class="tile"><span>Số buổi vắng</span><b>${abs}</b><span>${absP} có phép · ${absK} không phép</span></div><div class="tile"><span>Tổng học phí</span><b>${money(due)}</b></div><div class="tile"><span>Đã đóng</span><b class="pos">${money(paid)}</b></div><div class="tile"><span>Còn thiếu</span><b class="${due-paid>0?"neg":""}">${money(due-paid)}</b></div></div>
+  ${items.length?`<div class="scroll"><table class="tbl"><thead><tr><th>Ngày</th><th style="text-align:left">Lớp</th><th style="text-align:left">Trạng thái</th><th>Tiền buổi</th></tr></thead><tbody>${items.map(i=>{const c=D.classes.get(i.cid);const d=parseYmd(i.date);return `<tr><td>${WDS[d.getDay()]} ${fmtShort(i.date)}</td><td style="text-align:left">${esc(c.name)}</td><td style="text-align:left">${i.absent?`<span class="tag bad">Vắng ${TYPES[i.type].toLowerCase()}</span> ${esc(i.note)}`:`<span class="tag ok">Đi học</span>`}</td><td>${i.absent?`<s class="mut">${money(i.fee)}</s> 0đ`:money(i.fee)}</td></tr>`}).join("")}</tbody><tfoot><tr><td colspan="3">Tổng học phí</td><td>${money(due)}</td></tr></tfoot></table></div>`:`<div class="empty">Không có buổi học nào trong tháng này.</div>`}
+  ${pays.length?`<h4 style="margin:12px 0 4px">Đã thu</h4>${pays.map(p=>`<div class="mut">${fmtDate(p.e.date)} · ${esc(D.classes.get(p.cid).name)} · ${money(p.e.amount)} ${esc(p.e.note||"")}</div>`).join("")}`:""}</div>
+  <div class="card"><h3>Tổng kết theo tháng</h3>${months.length?`<div class="scroll"><table class="tbl"><thead><tr><th>Tháng</th><th>Đi học</th><th>Vắng</th><th>Học phí</th><th>Đã đóng</th><th>Còn thiếu</th></tr></thead><tbody>${months.map(mm=>{const rr=[...calc(mm).values()].filter(r=>r.sid===s.id);const a=rr.reduce((x,r)=>x+r.att,0),b=rr.reduce((x,r)=>x+r.abs,0),d=rr.reduce((x,r)=>x+r.due,0),p=rr.reduce((x,r)=>x+r.paid,0);
+    return `<tr><td><a href="javascript:void 0" data-act="pmset" data-m="${mm}" style="color:var(--pri)">${monthLabel(mm)}</a></td><td>${a}</td><td>${b}</td><td>${money(d)}</td><td>${money(p)}</td><td class="${d-p>0?"neg":""}">${money(d-p)}</td></tr>`}).join("")}</tbody></table></div>`:`<div class="empty">Chưa có dữ liệu.</div>`}</div></div>`;
+}
+
+/* ============ Hộp thoại ============ */
+function modal(title,body,buttons,opts){
+  opts=opts||{};const el=document.createElement("div");el.className="overlay";
+  el.innerHTML=`<div class="dlg ${opts.wide?"wide":""}" role="dialog"><div class="dh"><b>${esc(title)}</b><button class="ic" data-x>✕</button></div><div class="db">${body}</div><div class="df"></div></div>`;
+  const close=()=>el.remove();el.querySelector("[data-x]").onclick=close;
+  el.addEventListener("mousedown",e=>{if(e.target===el)close()});
+  const df=el.querySelector(".df");
+  (buttons||[]).forEach(b=>{const btn=document.createElement("button");btn.type="button";btn.className="btn "+(b.cls||"");btn.textContent=b.label;
+    btn.onclick=async()=>{if(b.fn){let r;try{r=await b.fn(el)}catch(e){console.error(e);toast("Lỗi: "+(e.message||e));return}if(r===false)return}close()};df.append(btn)});
+  $("#modal-root").append(el);const f=el.querySelector("input[type=text],input[type=number]");if(f&&!opts.nofocus)setTimeout(()=>f.focus(),30);
+  return{el,close};
+}
+const confirmBox=(msg,label,fn)=>modal("Xác nhận",`<p>${esc(msg)}</p>`,[{label:"Huỷ"},{label,cls:"bad",fn}]);
+function monthSel(name,val){
+  const y0=+val.slice(0,4);const ys=[];for(let y=y0-4;y<=y0+4;y++)ys.push(y);
+  return `<span class="fr"><select data-n="${name}-m">${Array.from({length:12},(_,i)=>`<option value="${pad(i+1)}" ${+val.slice(5)===i+1?"selected":""}>Tháng ${i+1}</option>`).join("")}</select><select data-n="${name}-y">${ys.map(y=>`<option ${y===y0?"selected":""}>${y}</option>`).join("")}</select></span>`;
+}
+const readMonth=(el,name)=>el.querySelector(`[data-n="${name}-y"]`).value+"-"+el.querySelector(`[data-n="${name}-m"]`).value;
+function toast(msg,logId){
+  const t=document.createElement("div");t.className="t";t.innerHTML=`<span>${esc(msg)}</span>${logId?`<button>Hoàn tác</button>`:""}`;
+  if(logId)t.querySelector("button").onclick=()=>{undo(logId);t.remove()};
+  $("#toast").append(t);setTimeout(()=>t.remove(),logId?8000:4500);
+}
+
+/* ---- Số tiền ---- */
+function findMoney(w){
+  let m=/(\d+(?:[.,]\d+)?)\s*(?:trieu|tr|m)(?![a-z])\s*(\d{1,3})?(?!\d)/.exec(w);
+  if(m){const a=+m[1].replace(",",".");let v=a*1e6;if(m[2])v+=Number("0."+m[2])*1e6;return{amount:Math.round(v),idx:m.index,len:m[0].length}}
+  m=/(\d+(?:[.,]\d+)?)\s*(?:k|nghin|ngan)(?![a-z])/.exec(w);
+  if(m)return{amount:Math.round(+m[1].replace(",",".")*1000),idx:m.index,len:m[0].length};
+  m=/(\d{1,3}(?:[.,]\d{3})+|\d+)(?:\s*(?:vnd|dong|dg|d)(?![a-z]))?/.exec(w);
+  if(m){let v=+m[1].replace(/[.,]/g,"");let small=false;if(v<1000){v*=1000;small=true}return{amount:v,idx:m.index,len:m[0].length,small}}
+  return null;
+}
+function parseAmountField(s){s=norm(String(s||"")).trim();if(!s)return null;const f=findMoney(s);if(!f)return null;if(f.small&&!/[a-z]/.test(s))return Math.round(f.amount/1000);return f.amount}
+
+/* ---- Dialog: lớp ---- */
+function classDialog(id){
+  const c=id?D.classes.get(id):null;const cm=today().slice(0,7);
+  const fees=c?[...c.fees].sort((a,b)=>a.from<b.from?-1:1):[];
+  const body=`<label class="f">Tên lớp</label><input type="text" name="name" value="${esc(c?c.name:"")}" placeholder="VD: Toán 11">
+  <label class="f">Học phí một buổi (VD: 150k, 150000)</label><input type="text" name="fee" value="${c?classFee(c,cm):""}" placeholder="150k">
+  ${c?`<label class="f">Áp dụng mức mới từ tháng</label>${monthSel("from",cm)}<label class="fr"><input type="checkbox" name="all"> Sửa cho mọi tháng (kể cả các tháng đã qua)</label>
+  <label class="f">Lịch sử học phí lớp</label>${fees.map(f=>`<div class="mut">${f.from==="0000-00"?"Từ đầu":"Từ "+monthLabel(f.from)}: ${money(f.fee)}/buổi</div>`).join("")}`:""}`;
+  modal(c?"Sửa lớp":"Tạo lớp",body,[
+    ...(c?[{label:"Xoá lớp",cls:"bad",fn:()=>{confirmBox(`Xoá lớp “${c.name}” cùng các buổi học và khoản thu của lớp?`,"Xoá",()=>deleteClass(id));return true}}]:[]),
+    {label:"Huỷ"},
+    {label:"Lưu",cls:"pri",fn:el=>{
+      const name=el.querySelector("[name=name]").value.trim();const fee=parseAmountField(el.querySelector("[name=fee]").value);
+      if(!name){toast("Nhập tên lớp");return false}
+      if([...D.classes].some(([k,x])=>k!==id&&norm(x.name).trim()===norm(name).trim())){toast("Đã có lớp trùng tên");return false}
+      if(fee==null){toast("Nhập học phí một buổi");return false}
+      if(!c){const nid=uid();act(`Tạo lớp ${name} (${money(fee)}/buổi)`,tx=>{tx.mut("classes",nid,{name,color:D.classes.size%8,fees:[{from:"0000-00",fee}]})})}
+      else{const from=readMonth(el,"from");const all=el.querySelector("[name=all]").checked;
+        act(`Sửa lớp ${name}: ${money(fee)}/buổi${all?"":" từ "+monthLabel(from)}`,tx=>{const x=tx.get("classes",id);x.name=name;
+          if(all)x.fees=[{from:"0000-00",fee}];else{const cur=classFee(c,from);x.fees=x.fees.filter(f=>f.from!==from);if(cur!==fee||x.fees.length===0)x.fees.push({from,fee})}})}
+    }}]);
+}
+function deleteClass(id){
+  const c=D.classes.get(id);
+  act(`Xoá lớp ${c.name}`,tx=>{tx.del("classes",id);
+    for(const [k,s] of D.sessions)if(s.classId===id)tx.del("sessions",k);
+    for(const [k,p] of D.payments)if(p.classId===id)tx.del("payments",k);
+    for(const [k,s] of D.students){if(s.enroll&&s.enroll[id]){const x=tx.get("students",k);delete x.enroll[id];x.fees=(x.fees||[]).filter(f=>f.classId!==id)}}});
+}
+
+/* ---- Dialog: học sinh ---- */
+function studentDialog(id){
+  const s=id?D.students.get(id):null;const cs=classList();const T=today();
+  const clsRows=cs.map(c=>{const e=s&&s.enroll&&s.enroll[c.id];return `<div class="fr" data-cid="${c.id}"><label style="flex:1;min-width:120px;display:flex;gap:6px;align-items:center"><input type="checkbox" data-n="en" ${e?"checked":""}><span class="dot c${c.color||0}"></span>${esc(c.name)}</label><span class="mut">từ</span><input type="date" data-n="from" value="${e?e.from:T}" style="width:150px"><span class="mut">đến</span><input type="date" data-n="to" value="${e&&e.to?e.to:""}" style="width:150px"></div>`}).join("")||`<div class="mut">Chưa có lớp. Tạo lớp trước.</div>`;
+  const feeRow=(f)=>`<div class="fr" data-fee><select data-n="fc"><option value="">Mọi lớp</option>${cs.map(c=>`<option value="${c.id}" ${f&&f.classId===c.id?"selected":""}>${esc(c.name)}</option>`).join("")}</select>${monthSel("ff"+uid(),f?f.from:T.slice(0,7))}<input type="text" data-n="fv" value="${f?f.fee:""}" placeholder="120k" style="width:100px"><button type="button" class="ic" data-rm>✕</button></div>`;
+  const body=`<label class="f">Họ và tên</label><input type="text" name="name" value="${esc(s?s.name:"")}">
+  <label class="f">Số điện thoại (không bắt buộc)</label><input type="text" name="phone" value="${esc(s&&s.phone||"")}">
+  <label class="f">Ghi chú (phụ huynh, trường…)</label><input type="text" name="note" value="${esc(s&&s.note||"")}">
+  <label class="f">Các lớp đang học (tick lớp, ngày vào học; “đến” để trống nếu còn học)</label>${clsRows}
+  <label class="f">Học phí riêng (áp dụng từ một tháng; để trống = dùng học phí lớp)</label><div id="feeRows">${(s&&s.fees||[]).map(feeRow).join("")}</div><button type="button" class="btn sm" id="addFee">+ Thêm học phí riêng</button>`;
+  const m=modal(s?"Sửa học sinh":"Thêm học sinh",body,[
+    ...(s?[{label:"Xoá",cls:"bad",fn:()=>{confirmBox(`Xoá học sinh “${s.name}” và các khoản thu của em?`,"Xoá",()=>act(`Xoá học sinh ${s.name}`,tx=>{tx.del("students",id);
+      for(const [k,p] of D.payments)if(p.studentId===id)tx.del("payments",k);
+      for(const [k,se] of D.sessions)if(se.absent&&se.absent[id]){tx.get("sessions",k);delete tx.get("sessions",k).absent[id]}
+      if(ST.profile&&ST.profile.sid===id)ST.profile=null}));return true}}]:[]),
+    {label:"Huỷ"},
+    {label:"Lưu",cls:"pri",fn:el=>{
+      const name=el.querySelector("[name=name]").value.trim();if(!name){toast("Nhập tên học sinh");return false}
+      const enroll={};for(const r of el.querySelectorAll("[data-cid]")){if(r.querySelector("[data-n=en]").checked){const from=r.querySelector("[data-n=from]").value||T;const to=r.querySelector("[data-n=to]").value||"";if(to&&to<from){toast("Ngày kết thúc phải sau ngày vào học");return false}enroll[r.dataset.cid]={from,to}}}
+      const fees=[];for(const r of el.querySelectorAll("[data-fee]")){const v=parseAmountField(r.querySelector("[data-n=fv]").value);if(v==null)continue;
+        const ms=r.querySelectorAll("select");fees.push({classId:r.querySelector("[data-n=fc]").value,from:ms[1].value+"-"+ms[2].value,fee:v})}
+      const nid=id||uid();const data={name,phone:el.querySelector("[name=phone]").value.trim(),note:el.querySelector("[name=note]").value.trim(),enroll,fees};
+      act(`${s?"Sửa":"Thêm"} học sinh ${name}`,tx=>{tx.mut("students",nid,{});const x=tx.get("students",nid);Object.assign(x,data)});
+    }}],{wide:true,nofocus:false});
+  m.el.querySelector("#addFee").onclick=()=>{m.el.querySelector("#feeRows").insertAdjacentHTML("beforeend",feeRow(null))};
+  m.el.addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(b)b.closest("[data-fee]").remove()});
+}
+
+/* ---- Dialog: thu tiền ---- */
+function payDialog(sid,cid,m){
+  const s=D.students.get(sid),c=D.classes.get(cid);const r=calc(m).get(sid+"|"+cid)||{due:0,paid:0};const owe=Math.max(0,r.due-r.paid);
+  modal(`Thu tiền · ${s.name}`,`<div class="mut">${esc(c.name)} · ${monthLabel(m)} · phải đóng ${money(r.due)}, đã đóng ${money(r.paid)}</div>
+  <label class="f">Số tiền thu (VD: 500k, 1tr2)</label><input type="text" name="amt" value="${owe||""}">
+  <label class="f">Ngày thu</label><input type="date" name="date" value="${today()}"><label class="f">Ghi chú</label><input type="text" name="note">`,[{label:"Huỷ"},{label:"Lưu",cls:"pri",fn:el=>{
+    const amt=parseAmountField(el.querySelector("[name=amt]").value);if(!amt){toast("Nhập số tiền");return false}
+    const date=el.querySelector("[name=date]").value||today();const note=el.querySelector("[name=note]").value.trim();
+    act(`Thu ${money(amt)} của ${s.name} · ${c.name} · ${monthLabel(m)}`,tx=>{const p=tx.mut("payments",payId(sid,cid,m),{studentId:sid,classId:cid,month:m,entries:[]});p.entries.push({id:uid(),date,amount:amt,note})});
+  }}]);
+}
+function editPaysDialog(sid,cid,m){
+  const s=D.students.get(sid),c=D.classes.get(cid);const p=D.payments.get(payId(sid,cid,m));const es=(p&&p.entries)||[];
+  const row=e=>`<div class="fr" data-e="${e.id}"><input type="date" data-n="d" value="${e.date}" style="width:150px"><input type="text" data-n="a" value="${e.amount}" style="width:110px"><input type="text" data-n="t" value="${esc(e.note||"")}" placeholder="ghi chú" style="flex:1;min-width:80px"><button class="ic" type="button" data-rm>✕</button></div>`;
+  const mm=modal(`Số tiền đã thu · ${s.name}`,`<div class="mut">${esc(c.name)} · ${monthLabel(m)}</div><div id="er">${es.map(row).join("")||'<div class="mut">Chưa có khoản thu nào.</div>'}</div><button type="button" class="btn sm" id="ae">+ Thêm khoản thu</button>`,[{label:"Huỷ"},{label:"Lưu",cls:"pri",fn:el=>{
+    const out=[];for(const r of el.querySelectorAll("[data-e]")){const a=parseAmountField(r.querySelector("[data-n=a]").value);if(a==null){toast("Số tiền không hợp lệ");return false}out.push({id:r.dataset.e,date:r.querySelector("[data-n=d]").value||today(),amount:a,note:r.querySelector("[data-n=t]").value.trim()})}
+    act(`Sửa khoản thu ${s.name} · ${c.name} · ${monthLabel(m)}`,tx=>{if(!out.length){tx.del("payments",payId(sid,cid,m))}else{const x=tx.mut("payments",payId(sid,cid,m),{studentId:sid,classId:cid,month:m,entries:[]});x.entries=out}});
+  }}]);
+  mm.el.querySelector("#ae").onclick=()=>{const er=mm.el.querySelector("#er");if(!er.querySelector("[data-e]"))er.innerHTML="";er.insertAdjacentHTML("beforeend",row({id:uid(),date:today(),amount:"",note:""}))};
+  mm.el.addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(b)b.closest("[data-e]").remove()});
+}
+function noteDialog(title,val,fn){modal(title,`<input type="text" name="n" value="${esc(val||"")}" placeholder="Ghi chú…">`,[{label:"Huỷ"},{label:"Lưu",cls:"pri",fn:el=>fn(el.querySelector("[name=n]").value.trim())}])}
+
+/* ============ Sự kiện ============ */
+const ACT={
+  tab:t=>{ST.tab=t.dataset.tab;render()},
+  mshift:t=>{ST.month=addMonth(ST.month,+t.dataset.d);render()},
+  goToday:()=>{ST.date=today();ST.month=ST.date.slice(0,7);render()},
+  pick:t=>{ST.date=t.dataset.date;render()},
+  mmshift:t=>{ST.moneyMonth=addMonth(ST.moneyMonth,+t.dataset.d);render()},
+  newClass:()=>classDialog(),editClass:t=>classDialog(t.dataset.id),
+  newStudent:()=>studentDialog(),editStudent:t=>studentDialog(t.dataset.id),
+  openStudent:t=>{const m=ST.tab==="money"?ST.moneyMonth:today().slice(0,7);ST.profile={sid:t.dataset.id,month:m};render()},
+  closeProfile:()=>{ST.profile=null;render()},
+  pmshift:t=>{ST.profile.month=addMonth(ST.profile.month,+t.dataset.d);render()},
+  pmset:t=>{ST.profile.month=t.dataset.m;render();$("#prof").scrollTo(0,0)},
+  histGo:t=>{ST.hist={cid:t.dataset.cid,month:"",sid:""};ST.tab="hist";render()},
+  goDay:t=>{ST.date=t.dataset.date;ST.month=ST.date.slice(0,7);ST.tab="cal";ST.profile=null;render()},
+  addPay:t=>payDialog(t.dataset.sid,t.dataset.cid,t.dataset.m),
+  editPays:t=>editPaysDialog(t.dataset.sid,t.dataset.cid,t.dataset.m),
+  undo:t=>undo(t.dataset.id),
+  sesnote:t=>{const se=D.sessions.get(t.dataset.id);noteDialog("Ghi chú buổi học",se&&se.note,v=>act("Ghi chú buổi học",tx=>{tx.get("sessions",t.dataset.id).note=v}))},
+  absnote:t=>{const se=D.sessions.get(t.dataset.id);const a=se&&se.absent&&se.absent[t.dataset.sid];noteDialog("Lý do vắng",a&&a.note,v=>act("Ghi chú vắng",tx=>{tx.get("sessions",t.dataset.id).absent[t.dataset.sid].note=v}))},
+  helpEx:()=>{showReply({kind:"info",html:`<b>Ví dụ lệnh:</b><div class="chips2">${EXAMPLES.map(x=>`<button class="btn sm" data-act="fillEx" data-t="${esc(x)}">${esc(x)}</button>`).join("")}</div>`})},
+  fillEx:t=>{$("#cmdin").value=t.dataset.t;$("#cmdin").focus()},
+  chip:t=>{const p=ST.pending;if(!p)return;const o=p.options[+t.dataset.i];runCommand(p.text,mergeCtx(p.ctx,o.patch))},
+  logout:async()=>{if(ST.sb){await ST.sb.auth.signOut();location.reload()}},
+  closeReply:()=>{$("#reply").innerHTML="";ST.pending=null},
+};
+const EXAMPLES=["Nam và Lan vắng hôm nay lớp Toán 11","Nam vắng có phép hôm qua","Lớp Lý 12 học ngày 15/11","Lớp Toán 11 nghỉ thứ 4","Nam đóng 500k","Lan đã đóng đủ tháng 10","Học phí Nam lớp Toán 11 là 120k từ tháng 12","Nam có mặt hôm nay lớp Toán 11"];
+document.addEventListener("click",async e=>{const t=e.target.closest("[data-act]");if(!t)return;const h=ACT[t.dataset.act];if(!h)return;if(t.tagName==="A")e.preventDefault();
+  try{await h(t,e)}catch(err){console.error(err);toast("Có lỗi: "+(err.message||err))}});
+const CHG={
+  tick:(t)=>{const cid=t.dataset.cid,date=t.dataset.date,id=sesId(cid,date),c=D.classes.get(cid);
+    if(t.checked)act(`Thêm buổi ${c.name} ngày ${fmtDate(date)}`,tx=>{tx.mut("sessions",id,{classId:cid,date,absent:{},note:""})});
+    else act(`Bỏ buổi ${c.name} ngày ${fmtDate(date)}`,tx=>{tx.del("sessions",id)})},
+  abs:t=>{const {id,sid}=t.dataset;const s=D.students.get(sid);const se=D.sessions.get(id);
+    act(`${t.checked?"Vắng":"Có mặt"}: ${s.name} · ${D.classes.get(se.classId).name} · ${fmtShort(se.date)}`,tx=>{const x=tx.get("sessions",id);x.absent=x.absent||{};if(t.checked)x.absent[sid]={type:""};else delete x.absent[sid]})},
+  abstype:t=>{const {id,sid}=t.dataset;act(`Loại vắng: ${D.students.get(sid).name} → ${TYPES[t.value]}`,tx=>{tx.get("sessions",id).absent[sid].type=t.value})},
+  hist:t=>{ST.hist[t.dataset.k]=t.value;if(t.dataset.k==="cid"){ST.hist.month="";ST.hist.sid=""}render()},
+};
+document.addEventListener("change",e=>{const t=e.target.closest("[data-chg]");if(t&&CHG[t.dataset.chg])CHG[t.dataset.chg](t)});
+document.addEventListener("input",e=>{if(e.target.id==="sq"){ST.q=e.target.value;$("#slist").innerHTML=studentListHtml()}});
+
+/* ============ Lệnh tự nhiên ============ */
+const mergeCtx=(a,b)=>({classId:(b&&b.classId)||(a&&a.classId)||null,pick:Object.assign({},a&&a.pick,b&&b.pick),cls:Object.assign({},a&&a.cls,b&&b.cls)});
+function showReply(r){
+  const el=$("#reply");if(!r){el.innerHTML="";return}
+  const cls=r.kind==="ok"?"ok":r.kind==="err"?"err":"";
+  el.innerHTML=`<div class="msg ${cls}"><div class="row"><div class="grow">${r.html}</div><button class="ic" data-act="closeReply">✕</button></div>${r.undo?`<button class="btn sm" data-act="undo" data-id="${r.undo}" style="margin-top:6px">↩ Hoàn tác</button>`:""}${r.options?`<div class="chips2">${r.options.map((o,i)=>`<button class="btn sm" data-act="chip" data-i="${i}">${esc(o.label)}</button>`).join("")}</div>`:""}</div>`;
+}
+function interpret(raw,ctx){
+  ctx=mergeCtx(ctx,null);
+  const text=raw.normalize("NFC").trim();const lower=text.toLowerCase();
+  let w=norm(text);const T=today();
+  const blank=(i,l)=>{w=w.slice(0,i)+" ".repeat(l)+w.slice(i+l)};
+  const info=message=>({type:"info",message});
+  const ask=(question,options)=>({type:"ask",question,options});
+  const dates=[];const addDate=d=>{if(d&&!dates.includes(d))dates.push(d)};
+  const nowY=+T.slice(0,4),nowM=+T.slice(5,7);
+  const mk=(y,m,d)=>{const dt=new Date(y,m-1,d);return(dt.getMonth()===m-1&&dt.getDate()===d)?ymd(dt):null};
+  let re,m;
+  re=/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/g;
+  while((m=re.exec(w))){let y=m[3]?+m[3]:nowY;if(y<100)y+=2000;addDate(mk(y,+m[2],+m[1]));blank(m.index,m[0].length)}
+  re=/ngay\s+(\d{1,2})\s+thang\s+(\d{1,2})(?:\s+nam\s+(\d{4}))?/g;
+  while((m=re.exec(w))){addDate(mk(m[3]?+m[3]:nowY,+m[2],+m[1]));blank(m.index,m[0].length)}
+  re=/ngay\s+(\d{1,2}(?:\s*(?:,|va|&)\s*\d{1,2})*)(?!\d)/g;
+  while((m=re.exec(w))){(m[1].match(/\d{1,2}/g)||[]).forEach(n=>addDate(mk(nowY,nowM,+n)));blank(m.index,m[0].length)}
+  for(const [r,o] of [[/hom nay|bua nay/g,0],[/hom qua/g,-1],[/hom kia|hom truoc/g,-2],[/ngay mai|hom sau/g,1],[/ngay kia/g,2]]){
+    while((m=r.exec(w))){addDate(addDays(T,o));blank(m.index,m[0].length)}}
+  re=/(?:thu\s*(hai|ba|tu|nam|sau|bay|[2-7])(?![a-z0-9])|chu nhat|\bcn\b)(?:\s*(tuan truoc|tuan nay|tuan sau|tuan toi))?/g;
+  while((m=re.exec(w))){
+    const g=m[1];const isWord=g&&/[a-z]/.test(g);
+    if(isWord&&lower.slice(m.index,m.index+3)!=="thứ"){continue}
+    const k=g?({hai:0,ba:1,tu:2,nam:3,sau:4,bay:5})[g]??(+g-2):6;
+    const shift=/truoc/.test(m[2]||"")?-1:/sau|toi/.test(m[2]||"")?1:0;
+    const off=(parseYmd(T).getDay()+6)%7;addDate(addDays(T,-off+k+7*shift));blank(m.index,m[0].length)}
+  let month=null,monthGuess=false;
+  if((m=/thang\s+(\d{1,2})(?:\s*[\/\-]\s*(\d{4}))?/.exec(w))){const mo=+m[1];if(mo>=1&&mo<=12){let y=m[2]?+m[2]:nowY;monthGuess=!m[2];month=y+"-"+pad(mo)}blank(m.index,m[0].length)}
+  else if((m=/thang nay/.exec(w))){month=T.slice(0,7);blank(m.index,m[0].length)}
+  else if((m=/thang truoc/.exec(w))){month=addMonth(T.slice(0,7),-1);blank(m.index,m[0].length)}
+  const useDates=dates.length?dates.slice().sort():[T];
+
+  let allFlag=false;
+  if(/(^|\s)(ca lop|tat ca|ca nhom)(?![a-z])/.test(w)){allFlag=true;w=w.replace(/ca lop/g,"   lop").replace(/tat ca|ca nhom/g,x=>" ".repeat(x.length))}
+  /* lớp */
+  const classes=classList();let cls=ctx.classId?D.classes.has(ctx.classId)?Object.assign({id:ctx.classId},D.classes.get(ctx.classId)):null:null;
+  const wb=(s)=>new RegExp("(^|[^a-z0-9])("+s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![a-z0-9])","g");
+  if(!cls){
+    const hits=[];
+    for(const c of classes){const n=norm(c.name).trim().replace(/\s+/g," ");const r=wb(n);const mm=r.exec(w);if(mm)hits.push({c,idx:mm.index+mm[1].length,len:n.length})}
+    if(hits.length){hits.sort((a,b)=>b.len-a.len);const h=hits[0];cls=h.c;blank(h.idx,h.len);
+      const pm=/lop\s*$/.exec(w.slice(0,h.idx));if(pm)blank(pm.index,pm[0].length)}
+    else{
+      const lm=/(^|[^a-z0-9])lop\s+([a-z0-9]+)(?:\s+(\d+[a-z]?)(?![a-z0-9]))?/.exec(w);
+      if(lm){const word=lm[2],num=lm[3];let cand=classes.filter(c=>norm(c.name).split(/\s+/).includes(word));
+        const label=word+(num?" "+num:"");
+        if(num){cand=cand.filter(c=>norm(c.name).split(/\s+/).includes(num))}
+        if(cand.length===1){cls=cand[0];blank(lm.index+lm[1].length,lm[0].length-lm[1].length)}
+        else if(cand.length>1)return ask(`“Lớp ${label}” là lớp nào?`,cand.map(c=>({label:c.name,patch:{classId:c.id}})));
+        else return info(`Mình không thấy lớp nào tên “${label}”. Các lớp hiện có: ${classes.map(c=>c.name).join(", ")||"(chưa có)"}.`)}
+    }
+  }
+  /* học phí / số tiền */
+  const moneyF=findMoney(w);let amount=moneyF?moneyF.amount:null;if(moneyF)blank(moneyF.idx,moneyF.len);
+  const full=/(^|[^a-z])(du|day du|het|tron)(?![a-z])/.test(w);
+  /* cả lớp */
+  /* học sinh */
+  const aliasMap=new Map();
+  for(const s of studentList()){const t=norm(s.name).trim().split(/\s+/);const al=new Set([t.join(" "),t.slice(-2).join(" "),t[t.length-1]]);
+    for(const a of al)if(a.length>=2){if(!aliasMap.has(a))aliasMap.set(a,[]);aliasMap.get(a).push(s)}}
+  const found=[];
+  for(const a of [...aliasMap.keys()].sort((x,y)=>y.length-x.length)){const r=wb(a);let mm;while((mm=r.exec(w))){const idx=mm.index+mm[1].length;found.push({a,idx});blank(idx,a.length);r.lastIndex=0}}
+  const sids=[];
+  for(const f of found){let cand=aliasMap.get(f.a);
+    if(cls){const c2=cand.filter(s=>s.enroll&&s.enroll[cls.id]);if(c2.length)cand=c2}
+    if(cand.length>1){const pk=ctx.pick[f.a];const hit=cand.find(s=>s.id===pk);if(hit)cand=[hit];
+      else return ask(`“${f.a}” là học sinh nào?`,cand.map(s=>({label:s.name+" ("+(Object.keys(s.enroll||{}).filter(k=>D.classes.has(k)).map(k=>D.classes.get(k).name).join(", ")||"chưa có lớp")+")",patch:{pick:{[f.a]:s.id}}})))}
+    if(!sids.includes(cand[0].id))sids.push(cand[0].id)}
+  const stu=sids.map(id=>Object.assign({id},D.students.get(id)));
+  const has=r=>r.test(w);
+  const typ=has(/(khong|ko|k) phep|tu y/)?"K":has(/(co|xin) phep|phep/)?"P":"";
+  let reason="";const rm=/(?:^|\s)(?:vi|do|ly do(?: la)?)\s+(.+)$/i.exec(lower.replace(/không phép|có phép/g,""));if(rm)reason=rm[1].trim();
+
+  /* ---- Vắng / có mặt ---- */
+  const negAbs=has(/(huy|bo|xoa|khong|ko) vang|co mat|den hoc|di hoc lai/);
+  const absWords=has(/(vang|nghi|khong di hoc|ko di hoc|bo hoc|khong den)/);
+  const presentIntent=negAbs||(has(/di hoc/)&&!absWords);
+  const absentIntent=!presentIntent&&absWords;
+  if((stu.length||allFlag)&&(presentIntent||absentIntent)&&!has(/(^|\s)(dong|nop|tra|thanh toan)(?![a-z])/)){
+    const present=presentIntent;
+    if(allFlag&&!cls){if(classes.length===1)cls=classes[0];else return info("Bạn nói rõ giúp mình lớp nào nhé (vd: “cả lớp Toán 11 vắng hôm nay”).")}
+    const lines=new Map();const tx=new Tx();const errs=[];let created=0;
+    for(const date of useDates){
+      let targets=stu;if(allFlag)targets=roster(cls.id,date);
+      for(const s of targets){
+        let cid=cls?cls.id:ctx.cls[s.id];
+        if(!cid){
+          const onDate=classes.filter(c=>D.sessions.has(sesId(c.id,date))&&inEnroll(s,c.id,date));
+          if(onDate.length===1)cid=onDate[0].id;
+          else{const en=classes.filter(c=>inEnroll(s,c.id,date));
+            if(en.length===1)cid=en[0].id;
+            else if(!en.length){errs.push(`${s.name} chưa thuộc lớp nào vào ${fmtShort(date)}.`);continue}
+            else return ask(`${s.name} học nhiều lớp. Lớp nào?`,(onDate.length?onDate:en).map(c=>({label:c.name,patch:{cls:{[s.id]:c.id}}})))}}
+        if(!inEnroll(s,cid,date)){errs.push(`${s.name} chưa thuộc lớp ${D.classes.get(cid).name} vào ${fmtShort(date)}.`);continue}
+        const id=sesId(cid,date);const had=tx.get("sessions",id);
+        if(present&&!had)continue;
+        const se=tx.mut("sessions",id,{classId:cid,date,absent:{},note:""});if(!had)created++;
+        se.absent=se.absent||{};
+        if(present)delete se.absent[s.id];
+        else{const old=se.absent[s.id];se.absent[s.id]={type:typ||(old&&old.type)||""};const n=reason||(old&&old.note);if(n)se.absent[s.id].note=n}
+        const k=fmtShort(date)+" · "+D.classes.get(cid).name;(lines.get(k)||lines.set(k,[]).get(k)).push(s.name);
+      }
+    }
+    if(errs.length)return info(errs.join(" "));
+    if(!lines.size)return info("Không có gì để thay đổi (học sinh chưa bị ghi vắng ở buổi đó).");
+    const sum=[...lines].map(([k,v])=>`${present?"Có mặt":"Vắng"+(typ?" "+TYPES[typ].toLowerCase():"")} ${k}: ${v.join(", ")}`).join("; ")+(created?` (đã tạo ${created} buổi học mới)`:"");
+    return{type:"ok",tx,summary:sum};
+  }
+  /* ---- Thu tiền ---- */
+  const payV=has(/(^|\s)(dong|nop|tra|thu|thanh toan|dong tien)(?![a-z])/);
+  if(stu.length&&(payV||(amount!=null&&!has(/hoc phi/)))&&!has(/hoc phi.*(la|=)/)){
+    if(stu.length>1)return info("Mỗi lệnh thu tiền chỉ cho một học sinh. Bạn tách lệnh giúp mình nhé.");
+    const s=stu[0];const cur=T.slice(0,7);let mo=month||cur;if(monthGuess&&mo>cur)mo=addMonth(mo,-12);
+    let cid=cls?cls.id:ctx.cls[s.id];
+    if(!cid){const en=classes.filter(c=>s.enroll&&s.enroll[c.id]);
+      if(en.length===1)cid=en[0].id;else if(!en.length)return info(`${s.name} chưa thuộc lớp nào.`);
+      else return ask(`${s.name} học nhiều lớp. Thu cho lớp nào?`,en.map(c=>({label:c.name,patch:{cls:{[s.id]:c.id}}})))}
+    if(!(s.enroll&&s.enroll[cid]))return info(`${s.name} chưa thuộc lớp ${D.classes.get(cid).name}.`);
+    const r=calc(mo).get(s.id+"|"+cid)||{due:0,paid:0};let small="";
+    if(amount==null){if(full){amount=r.due-r.paid;if(amount<=0)return info(`${s.name} đã đóng đủ ${monthLabel(mo)} · ${D.classes.get(cid).name} (phải đóng ${money(r.due)}, đã đóng ${money(r.paid)}).`)}else return info("Mình chưa thấy số tiền. Ví dụ: “Nam đóng 500k”.")}
+    else if(moneyF&&moneyF.small)small=` (hiểu “${moneyF.amount/1000}” là ${money(amount)})`;
+    const tx=new Tx();const p=tx.mut("payments",payId(s.id,cid,mo),{studentId:s.id,classId:cid,month:mo,entries:[]});p.entries.push({id:uid(),date:T,amount,note:""});
+    const left=r.due-r.paid-amount;
+    return{type:"ok",tx,summary:`Thu ${money(amount)}${small} của ${s.name} · ${D.classes.get(cid).name} · ${monthLabel(mo)} → ${left>0?"còn thiếu "+money(left):left<0?"dư "+money(-left):"đã đủ"}`};
+  }
+  /* ---- Đặt học phí ---- */
+  if(has(/hoc phi/)||(amount!=null&&!stu.length&&cls&&!has(/(^|\s)(dong|nop|thu)(?![a-z])/))){
+    if(amount==null)return info("Mình chưa thấy mức học phí. Ví dụ: “Học phí lớp Toán 11 là 150k từ tháng 12”.");
+    const from=month||T.slice(0,7);const tx=new Tx();
+    if(stu.length){if(stu.length>1)return info("Mỗi lệnh đặt học phí riêng cho một học sinh.");const s=stu[0];
+      let cid=cls?cls.id:ctx.cls[s.id];if(!cid){const en=classes.filter(c=>s.enroll&&s.enroll[c.id]);cid=en.length===1?en[0].id:""}
+      const x=tx.get("students",s.id);x.fees=(x.fees||[]).filter(f=>!(f.classId===cid&&f.from===from));x.fees.push({classId:cid,from,fee:amount});
+      return{type:"ok",tx,summary:`Học phí riêng của ${s.name}${cid?" · "+D.classes.get(cid).name:""}: ${money(amount)}/buổi từ ${monthLabel(from)}`}}
+    if(!cls)return info("Bạn nói rõ lớp hoặc học sinh nào nhé.");
+    const x=tx.get("classes",cls.id);x.fees=x.fees.filter(f=>f.from!==from);x.fees.push({from,fee:amount});
+    return{type:"ok",tx,summary:`Học phí lớp ${cls.name}: ${money(amount)}/buổi từ ${monthLabel(from)}`};
+  }
+  /* ---- Lịch ---- */
+  if(!stu.length&&cls){
+    const cancel=has(/(huy|xoa|bo) buoi|nghi|khong hoc|khong day|(^|\s)huy(\s|$)/);
+    const tx=new Tx();
+    if(cancel){const done=[];for(const d of useDates){const id=sesId(cls.id,d);if(tx.get("sessions",id)){tx.del("sessions",id);done.push(fmtShort(d))}}
+      if(!done.length)return info(`Lớp ${cls.name} không có buổi nào vào ${useDates.map(fmtShort).join(", ")}.`);
+      return{type:"ok",tx,summary:`Huỷ buổi lớp ${cls.name}: ${done.join(", ")}`}}
+    if(has(/(hoc|day|co lop|them|mo|buoi|lich|tick)/)||dates.length){
+      const done=[];for(const d of useDates){const id=sesId(cls.id,d);if(!tx.get("sessions",id)){tx.mut("sessions",id,{classId:cls.id,date:d,absent:{},note:""});done.push(fmtShort(d))}}
+      if(!done.length)return info(`Lớp ${cls.name} đã có buổi vào ${useDates.map(fmtShort).join(", ")}.`);
+      return{type:"ok",tx,summary:`Thêm buổi lớp ${cls.name}: ${done.join(", ")}`}}
+  }
+  return info("Mình chưa hiểu lệnh này. Bạn thử các mẫu sau:");
+}
+async function runCommand(text,ctx){
+  let r;try{r=interpret(text,ctx)}catch(e){console.error(e);showReply({kind:"err",html:"Lỗi khi hiểu lệnh: "+esc(e.message)});return}
+  if(r.type==="ok"){
+    try{const id=await commit(r.tx,{text,summary:r.summary,src:"Lệnh"});ST.pending=null;
+      showReply({kind:"ok",html:"✓ "+esc(r.summary),undo:id});
+      if(r.tx.ops().length===0){}
+    }catch(e){console.error(e);showReply({kind:"err",html:"Không ghi được: "+esc(e.message||e.code||e)})}
+  }else if(r.type==="ask"){ST.pending={text,ctx:mergeCtx(ctx,null),options:r.options};showReply({kind:"ask",html:"❓ "+esc(r.question),options:r.options})}
+  else{ST.pending=null;showReply({kind:"info",html:esc(r.message)+(/chưa hiểu/.test(r.message)?`<div class="chips2">${EXAMPLES.slice(0,4).map(x=>`<button class="btn sm" data-act="fillEx" data-t="${esc(x)}">${esc(x)}</button>`).join("")}</div>`:"")})}
+}
+$("#cmdform").addEventListener("submit",e=>{
+  e.preventDefault();const inp=$("#cmdin");const v=inp.value.trim();if(!v)return;inp.value="";
+  if(ST.pending){const nv=norm(v);const hit=ST.pending.options.map((o,i)=>({o,i})).filter(x=>norm(x.o.label).includes(nv));
+    if(hit.length===1){const p=ST.pending;runCommand(p.text,mergeCtx(p.ctx,hit[0].o.patch));return}}
+  ST.pending=null;runCommand(v,null);
+});
+
+/* ============ Khởi động ============ */
+async function init(){
+  render();
+  let ns=null;
+  if(APP_CONFIG.url&&APP_CONFIG.key&&window.supabase){
+    try{const sb=window.supabase.createClient(APP_CONFIG.url,APP_CONFIG.key);const ses=await ensureLogin(sb);
+      db=supabaseDB(sb,ses.user.id);ST.sb=sb;ST.user=ses.user.email;subscribe();render();return}
+    catch(e){console.error(e);toast("Không kết nối được Supabase: "+(e.message||e))}
+  }
+  try{if(window.claude&&claude.use)ns=await Promise.race([claude.use("db"),new Promise(r=>setTimeout(()=>r(null),8000))])}catch(e){console.warn(e)}
+  if(ns){db=ns}else{db=localDB();ST.local=true}
+  subscribe();
+}
+init();
+</script>
+</body>
+</html>
